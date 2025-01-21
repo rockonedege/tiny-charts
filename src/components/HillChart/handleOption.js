@@ -71,6 +71,13 @@ export function handleCoincide(iChartOption, baseOpt) {
   baseOpt.series[0]['barCategoryGap'] = iChartOption.coincide ? iChartOption.coincide : '-100%';
 }
 
+const setColorStops = (color, opacity, index, colors) => {
+  if (!color || index >= colors.length) {
+    throw new Error('Invalid color configuration');
+  }
+  return !opacity ? color : codeToRGB(codeToHex(color), opacity || 0.8);
+};
+
 // 配置渐变色
 export function setGradientColor(baseOpt, color, gradientColor, opacity, iChartOption) {
   if (gradientColor) {
@@ -86,15 +93,12 @@ export function setGradientColor(baseOpt, color, gradientColor, opacity, iChartO
             colorStops: [
               {
                 offset: 0,
-                color: codeToRGB(codeToHex(gradientColor[params.dataIndex % gradientColor.length]), opacity || 0.8),
+                color: setColorStops(gradientColor[params.dataIndex % gradientColor.length], opacity, params.dataIndex, gradientColor),
               },
               {
                 offset: 1,
-                color: codeToRGB(
-                  codeToHex(iChartOption.color[params.dataIndex % iChartOption.color.length]),
-                  opacity || 0.8,
-                ),
-              },
+                color: setColorStops(iChartOption.color[params.dataIndex % iChartOption.color.length], opacity, params.dataIndex, iChartOption.color),
+              }
             ],
             globalCoord: false,
           };

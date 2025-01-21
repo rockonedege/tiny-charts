@@ -5,7 +5,12 @@
       "title": "基础形态",
       "children": [
         {
-          "name": "山峰图",
+          "name": "山峰图-渐变色",
+          "routePath": "HillChart-9",
+          "imagePath": "./image/theme/light/HillChart/HillChart-9.png"
+        },
+        {
+          "name": "山峰图-纯色",
           "routePath": "HillChart-1",
           "imagePath": "./image/theme/light/HillChart/HillChart-1.png"
         }
