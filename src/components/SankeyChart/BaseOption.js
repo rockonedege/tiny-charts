@@ -49,7 +49,7 @@ const BaseOption = () => {
         itemStyle: {},
         lineStyle: {
           color: 'source',// 线条颜色过渡         
-          opacity: 0.6,// 线条透明度         
+          opacity: 0.5,// 线条透明度         
           curveness: 0.5,// 线条弯曲度
         },
         label: {
