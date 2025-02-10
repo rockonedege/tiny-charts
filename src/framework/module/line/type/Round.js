@@ -22,6 +22,7 @@ export default class Round {
 
   constructor(option) {
     this.radius = option.lineOption.style.radius === undefined ? this.radius : option.lineOption.style.radius;
+    this.lineDistance = option.lineOption.style.lineDistance === undefined ? this.lineDistance : option.lineOption.style.lineDistance;
   }
 
   // 左上角圆角
