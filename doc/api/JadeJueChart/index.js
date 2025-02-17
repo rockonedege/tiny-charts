@@ -40,7 +40,7 @@ const data = {
         angleAxis,
         radiusAxis,
         event,
-        ['type', '设置玉玦图的类别', 'string', 'unset'],
+        ['type', '设置玉玦图的类别', 'string', 'base'],
         ['labelContent', '设置玉玦图每个系列的展示文本', 'string', 'name']
     ],
     markdown: [
