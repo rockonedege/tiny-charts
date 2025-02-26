@@ -11,7 +11,7 @@
  */
 function JadeJueChart(aliasToken) {
 
-  const { colorPlaceholder, colorLabel, colorTextName, padding, borderWidthLG, borderRadius, colorMask } = aliasToken;
+  const { colorPlaceholder, colorLabel, colorTextName, padding, borderWidthLG, borderRadius, colorMask, barWidth } = aliasToken;
 
   return {
     itemBorderColor: colorMask,
@@ -21,6 +21,7 @@ function JadeJueChart(aliasToken) {
     labelPadding: padding,
     itemBorderWidth: borderWidthLG,
     itemBorderRadius: borderRadius,
+    barWidth
   };
 
 };

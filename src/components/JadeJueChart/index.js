@@ -29,6 +29,7 @@ class JadeJueChart {
     this.baseOption = cloneDeep(BaseOption);
     // 组装 iChartOption, 补全默认值
     this.iChartOption = init(cloneDeep(iChartOption));
+    this.chartInstance = chartInstance;
     // 根据 iChartOption 组装 baseOption
     this.updateOption(chartInstance);
   }
@@ -60,6 +61,11 @@ class JadeJueChart {
   }
 
   setOption() { }
+
+  resize(callback){
+    setbarWidth(this.iChartOption, this.baseOption, this.chartInstance, this.chartType);
+    callback(this.baseOption)
+  }
 }
 
 export default JadeJueChart;

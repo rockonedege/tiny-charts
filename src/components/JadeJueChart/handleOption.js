@@ -68,10 +68,10 @@ function setThemeRadius(iChartOption, baseOpt, chartInstance, textGap) {
 }
 
 function getOuterRing(baseOpt, chartInstance) {
-  const { _dom } = chartInstance;
-  const { width, height } = _dom.getBoundingClientRect();
+  const width = chartInstance.getWidth();
+  const height = chartInstance.getHeight();
   const canvasRadius = width > height ? height / 2 : width / 2;
-  let outerRing = baseOpt.polar.radius[1];
+  let outerRing = baseOpt.polar?.radius[1] || '60%';
   if (typeof outerRing === 'number') {
     return outerRing;
   } else if (outerRing.indexOf('%') > -1) {
