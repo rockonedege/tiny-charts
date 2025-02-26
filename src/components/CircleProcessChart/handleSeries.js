@@ -34,7 +34,7 @@ function getSeriesInit() {
 export function setSeries(seriesData, iChartOption, chartInstance) {
   const { data, itemStyle, markLine } = iChartOption;
   const series = [];
-  const barWidth = Number(iChartOption.barWidth) || 16;
+  const barWidth = Number(iChartOption.barWidth) || chartToken.barWidth;
   data.forEach((item, i) => {
     const seriesUnit = getSeriesInit();
     seriesUnit.name = item.name;
@@ -67,9 +67,6 @@ function getThemeStatusColor(status = 'success'){
 // 添加一个空series，使用该空series的pointer来作为阈值线的红线
 function setMarkLine(data, markLine, iChartOption, chartInstance, barWidth) {
   let {color, status='success', value} = markLine;
-  const {_dom} = chartInstance;
-  const { width, height } = _dom.getBoundingClientRect();
-  const canvasRadius = width > height ? height / 2 : width / 2;
   const  marklineColor = getThemeStatusColor(status);
   const temp = cloneDeep(emptySeriesUnit);
   const markLineUnit = cloneDeep(temp);
@@ -84,15 +81,7 @@ function setMarkLine(data, markLine, iChartOption, chartInstance, barWidth) {
   markLineUnit.center = iChartOption.position.center || ['50%', '50%'];
   markLineUnit.radius = iChartOption.position.radius || '50%';
   markLineUnit.animation = false;
-  let pointerOffsetCenter;
-  if(typeof markLineUnit.radius === 'number'){
-    pointerOffsetCenter = markLineUnit.radius / 2 - (barWidth / 4) 
-  }else if(markLineUnit.radius.indexOf('%')>-1){
-    let radius = Number(markLineUnit.radius.slice(0,-1)) / 100;
-    pointerOffsetCenter = radius*canvasRadius / 2 - (barWidth / 4)
-  }else if(typeof markLineUnit.radius === 'string'){
-    pointerOffsetCenter = Number(markLineUnit.radius) / 2 - (barWidth / 4)
-  }
+  let pointerOffsetCenter = computeMarkLinePosition(markLineUnit.radius, barWidth, chartInstance);
   markLineUnit.pointer = {
     icon: 'path://M0 0 L30 0 L30 100 L0 100 Z',
     width: 2,
@@ -106,4 +95,33 @@ function setMarkLine(data, markLine, iChartOption, chartInstance, barWidth) {
   markLineUnit.silent = true;
   markLineUnit.zlevel = 2;
   return markLineUnit;
+}
+
+// 计算阈值线位置 
+function computeMarkLinePosition(radius, barWidth, chartInstance){
+  let position;
+  const width = chartInstance.getWidth();
+  const height = chartInstance.getHeight();
+  const canvasRadius = width > height ? height / 2 : width / 2;
+  if(typeof radius === 'number'){
+    position = radius / 2 - (barWidth / 4) 
+  }else if(radius.indexOf('%')>-1){
+    radius = Number(radius.slice(0,-1)) / 100;
+    position = radius*canvasRadius / 2 - (barWidth / 4)
+  }else if(typeof radius === 'string'){
+    position = Number(radius) / 2 - (barWidth / 4)
+  }
+  return position
+}
+
+// 更新阈值线位置
+export function updateMarkLine(iChartOption, eChartOption, chartInstance){
+  let radius = iChartOption.position.radius || '50%';
+  const barWidth = Number(iChartOption.barWidth) || chartToken.barWidth;
+  const pointerOffsetCenter = computeMarkLinePosition(radius, barWidth, chartInstance);
+  eChartOption.series.forEach(item=>{
+    if(item.name === 'markLine'){
+      item.pointer.offsetCenter = iChartOption.markLine.offsetCenter || [0,  -pointerOffsetCenter];
+    }
+  })
 }

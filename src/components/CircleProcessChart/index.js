@@ -12,7 +12,7 @@
 import init from '../../option/init';
 import mini from '../../feature/mini/miniCircleProcessChart';
 import { getSeriesData, setTooltip, setTitle } from './handleOption';
-import { setSeries } from './handleSeries';
+import { setSeries, updateMarkLine } from './handleSeries';
 import PolarCoordSys from '../../option/PolarSys';
 import { CHART_TYPE } from '../../util/constants';
 import { mergeSeries } from '../../util/merge';
@@ -26,6 +26,7 @@ export default class CircleProcessChart {
     this.iChartOption = {};
     // 组装 iChartOption, 补全默认值
     this.iChartOption = init(iChartOption);
+    this.chartInstance = chartInstance;
     // 根据 iChartOption 组装 baseOption
     this.updateOption(chartInstance);
   }
@@ -47,7 +48,16 @@ export default class CircleProcessChart {
     mergeSeries(iChartOption, this.baseOption);
     mini(iChartOption, this.baseOption);
   }
+
   getOption() {
     return this.baseOption;
+  }
+
+  resize(callback) {
+    // 有阈值线时，更新阈值线位置
+    if(this.iChartOption.markLine){
+      updateMarkLine(this.iChartOption, this.baseOption, this.chartInstance)
+    }
+    callback(this.baseOption);
   }
 }
