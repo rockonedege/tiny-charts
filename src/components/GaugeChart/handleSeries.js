@@ -108,7 +108,8 @@ function handleSplitLine(iChartOption, seriesUnit) {
     seriesUnit.splitNumber = -1;
   }
   if (iChartOption.itemStyle) {
-    const { lineStyle, width } = iChartOption.itemStyle;
+    let { lineStyle, width } = iChartOption.itemStyle;
+    width = width || chartToken.barWidth;
     seriesUnit.splitLine.length = (lineStyle && lineStyle.length) || width || 10;
     seriesUnit.splitLine.distance = width ? width * -1 : -3;
   } else {
@@ -161,8 +162,8 @@ function handleDetail(seriesUnit, text, data) {
 // 设置仪表盘进度条宽度
 function handleProgress(seriesUnit, iChartOption, data) {
   const { itemStyle } = iChartOption;
-
-  seriesUnit.progress.width = itemStyle ? (itemStyle.width ? itemStyle.width : chartToken.barWidth) : chartToken.barWidth;
+  const barWidth = chartToken.barWidth;
+  seriesUnit.progress.width = itemStyle?.width ? itemStyle.width : barWidth;
   if (data && data.length !== 0 && data[0].value === 0) {
     seriesUnit.progress.roundCap = false;
   }
@@ -171,7 +172,8 @@ function handleProgress(seriesUnit, iChartOption, data) {
 // 设置仪表盘进度条宽度
 function handleAxisLine(seriesUnit, iChartOption) {
   const { itemStyle } = iChartOption;
-  seriesUnit.axisLine.lineStyle.width = itemStyle ? (itemStyle.width ? itemStyle.width : chartToken.barWidth) : chartToken.barWidth;
+  const barWidth = chartToken.barWidth;
+  seriesUnit.axisLine.lineStyle.width = itemStyle?.width ? itemStyle.width : barWidth;
 }
 
 // 轨道颜色分块
