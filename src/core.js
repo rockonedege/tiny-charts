@@ -153,8 +153,8 @@ export default class CoreChart extends BaseChart {
   setResize() {
     this.mediaScreenObserver && this.mediaScreenObserver.observe();
     this.echartsIns && this.echartsIns._dom && this.echartsIns.resize && this.echartsIns.resize({ width: 'auto' });
-    this.echartsIns && this.echartsIns._dom && this.ichartsIns && this.ichartsIns.resize && this.ichartsIns.resize((resizedOption) => {
-      this.setOption(resizedOption);
+    this.echartsIns && this.echartsIns._dom && this.ichartsIns && this.ichartsIns.resize && this.ichartsIns.resize((resizedOption, option = { notMerge: true } ) => {
+      this.setOption(resizedOption, option);
     });
   }
 
@@ -173,7 +173,7 @@ export default class CoreChart extends BaseChart {
       readScreen(this.dom, iChartOption.readScreen);
     }
     // 增加移动端类名
-    this.isMobile = mobile();
+    this.isMobile = iChartOption.isMobile || mobile();
     if (this.isMobile) this.dom.classList.add('mobile');
     // 使用图例扩展或svg图例时屏蔽默认图例
     if (iChartOption?.legend?.upgrade?.type !== undefined || iChartOption?.legend?.svg){
@@ -191,7 +191,7 @@ export default class CoreChart extends BaseChart {
     this.ichartsIns = new ChartClass(iChartOption, this.echartsIns, this.plugins);
     this.eChartOption = this.ichartsIns.getOption();
     // 配置图表事件
-    event(this.echartsIns, iChartOption.event);
+    event(this.echartsIns, iChartOption.event, this.ichartsIns);
     axistip(this.dom, this.echartsIns, this.eChartOption, this.iChartOption.axistip);
     mergeExtend(this.iChartOption, this.eChartOption);
   }

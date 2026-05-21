@@ -111,8 +111,8 @@ function handleSplitLine(iChartOption, seriesUnit) {
   if (iChartOption.itemStyle) {
     let { lineStyle, width } = iChartOption.itemStyle;
     width = width || chartToken.barWidth;
-    seriesUnit.splitLine.length = (lineStyle && lineStyle.length) || width || 10;
-    seriesUnit.splitLine.distance = width ? width * -1 : -3;
+    seriesUnit.splitLine.length = (lineStyle && lineStyle.length) || 7;
+    seriesUnit.splitLine.distance = (lineStyle && lineStyle.distance) || 0;
   } else {
     seriesUnit.splitLine.length = 7;
     seriesUnit.splitLine.distance = 0;
@@ -123,7 +123,7 @@ function handleSplitLine(iChartOption, seriesUnit) {
     } else {
       seriesUnit.splitLine.lineStyle.color = chartToken.splitLineColor;
     }
-    seriesUnit.splitLine.lineStyle.width = iChartOption.itemStyle.lineStyle.width || 4;
+    seriesUnit.splitLine.lineStyle.width = iChartOption.itemStyle.lineStyle.width || 2;
   }
 }
 
@@ -136,7 +136,7 @@ function handleTheme(iChartOption) {
 }
 
 // 配置仪表盘中心文本
-export function handleDetail(seriesUnit, text, data, sizeData,isAdaptive) {
+export function handleDetail(seriesUnit, text, data, sizeData, isAdaptive) {
   seriesUnit.detail.formatter =
     text.formatter ||
     function (value) {
@@ -148,7 +148,7 @@ export function handleDetail(seriesUnit, text, data, sizeData,isAdaptive) {
       
     };
   const space = isAdaptive ? sizeData.space : 24;
-  const valuePadding = isAdaptive ? sizeData.valuePadding : 0;
+  const valuePadding = isAdaptive ? (sizeData.valuePadding || 0) : 0;
   seriesUnit.detail.offsetCenter = text.offset || [0, 0];
   seriesUnit.detail.rich = {
     value: {
@@ -158,13 +158,14 @@ export function handleDetail(seriesUnit, text, data, sizeData,isAdaptive) {
       padding: [valuePadding, 0, 0, 0],
     },
     name: {
-      fontSize: sizeData.secondaryFontSize,
+      fontSize: sizeData.secondaryFontSize || sizeData.subFontSize,
       color: chartToken.descRichColor,
       padding: [space, 0, 0, 0],
+      fontWeight: 'normal',
     },
     unit: {
       color: chartToken.detailRichColor,
-      fontSize: sizeData.secondaryFontSize
+      fontSize: sizeData.secondaryFontSize || sizeData.subFontSize
     }
   };
   if (text?.formatterStyle) {
@@ -487,8 +488,8 @@ export function handleStatus(seriesUnit, iChartOption,radiusSize,text,sizeData,i
   }
   seriesUnit.color = color;
 
-  let name = iChartOption.data[0].name;
-  let unit = iChartOption.unit;
+  let name = iChartOption.data?.[0]?.name || '';
+  let unit = iChartOption.unit || '';
   seriesUnit.detail = {
     valueAnimation: true,
     offsetCenter: [0, 0],
@@ -510,10 +511,10 @@ export function handleStatus(seriesUnit, iChartOption,radiusSize,text,sizeData,i
         padding: [unitPadding, 0, 30, 0],
       },
       name: {
-        fontSize: sizeData.secondaryFontSize,
+        fontSize: sizeData.secondaryFontSize || sizeData.subFontSize,
         color: chartToken.descRichColor,
         padding: [lineHeight + sizeData.space, 0, 0, 0],
-
+        fontWeight: 'normal',
       },
       status: {
         fontWeight: 'bolder',
@@ -593,11 +594,12 @@ function setSeriesInit(seriesUnit, iChartOption) {
  * @param {数据} data
  * @returns
  */
-export function handleSeries(iChartOption,optionColor,containerWidth,containerHeight) {
+export function handleSeries(iChartOption, optionColor, containerWidth, containerHeight) {
   const data = iChartOption.data.length ? iChartOption.data : [{value:0,name: ''}];
   const text = iChartOption.text || {};
   const axisLabelStyle = iChartOption.axisLabelStyle || {};
-  const { silent } = iChartOption;
+  const { silent, itemStyle } = iChartOption;
+  const barWidth = chartToken.barWidth;
   const radiusSize = containerWidth > containerHeight ? containerHeight : containerWidth;
   // 更改仪表盘轨道底色
   handleTheme(iChartOption);
@@ -607,7 +609,7 @@ export function handleSeries(iChartOption,optionColor,containerWidth,containerHe
   } else {
     seriesInit.axisLabel['color'] = chartToken.descRichColor;
   }
-  seriesInit.axisLabel['distance'] = axisLabelStyle['distance'] || 22;
+  seriesInit.axisLabel['distance'] = axisLabelStyle['distance'] || Number(itemStyle?.width || barWidth) + 6 || 22;
   seriesInit.axisLabel['fontWeight'] = axisLabelStyle['fontWeight'] || 400;
   seriesInit.axisLabel['fontSize'] = axisLabelStyle['fontSize'] || 14;
   // 组装数据
@@ -620,7 +622,7 @@ export function handleSeries(iChartOption,optionColor,containerWidth,containerHe
   // 不同尺寸下的fontSize
   const sizeData = handleSize(seriesUnit,radiusSize);
   // 中间文本
-  handleDetail(seriesUnit, text, data,sizeData);
+  handleDetail(seriesUnit, text, data, sizeData, iChartOption.adaptive);
   // 进度条宽度
   handleProgress(seriesUnit, iChartOption, data);
   handleAxisLine(seriesUnit, iChartOption);
@@ -634,15 +636,15 @@ export function handleSeries(iChartOption,optionColor,containerWidth,containerHe
   return series;
 }
 
-export function adapt(iChartOption,baseOption,containerWidth,containerHeight) {
+export function adapt(iChartOption, baseOption, containerWidth, containerHeight) {
   const theme = iChartOption?.theme;
   const adaptive =  iChartOption?.adaptive;
   const series = baseOption.series[0];
   const text = iChartOption.text || {};
   // 如果主题为华为云主题，并且开启配置项则开启自适应功能
-  if (theme && theme.indexOf('cloud')!=-1 && adaptive){
+  if (theme && theme.indexOf('cloud')!=-1 && adaptive) {
     // 初始值为宽度的80%
-    let initRadius = containerWidth * 0.8 / 2;
+    let initRadius = containerWidth * 0.8;
     let radius = Math.max(120,Math.min(200,Math.min(initRadius,containerHeight))) / 2;
     let mainText;
     const value = iChartOption?.data[0]?.value;
@@ -654,8 +656,7 @@ export function adapt(iChartOption,baseOption,containerWidth,containerHeight) {
     }
     const barWidth = baseOption.series[0]?.progress?.width;
     let sizeData = calculateFontSize(radius * 2,mainText,barWidth);
-    // 主副文本的间距固定为4
-    sizeData.space = 4;
+    
     // 主文本的上padding
     if(sizeData.mainFontSize === 48) {
       sizeData.valuePadding = 0;
@@ -667,10 +668,24 @@ export function adapt(iChartOption,baseOption,containerWidth,containerHeight) {
   
     baseOption.series[0].axisLabel.show = false;
     baseOption.series[0].splitLine.show = false;
-    // 中间文本
-    handleDetail(series, text, iChartOption.data,sizeData,true);
-    // 内置状态仪表盘
-    handleStatus(series, iChartOption,radius,text,sizeData,true);
+    // 非内置仪表盘 中间文本 主副文本的间距按需决定
+    if(radius*2 >= 200) {
+      sizeData.space = 24;
+    } else if (radius*2 < 200 && radius*2 >= 160) {
+      sizeData.space = 18;
+    } else {
+      sizeData.space = 10;
+    }
+    handleDetail(series, text, iChartOption.data, sizeData, true);
+    // 内置状态仪表盘 space沿用默认规则
+    if(radius*2 >= 200) {
+      sizeData.space = 28;
+    } else if (radius*2 < 200 && radius*2 >= 160) {
+      sizeData.space = 4;
+    } else {
+      sizeData.space = 0;
+    }
+    handleStatus(series, iChartOption, radius, text, sizeData, true);
     baseOption.series[0].radius = radius;
   }
 }

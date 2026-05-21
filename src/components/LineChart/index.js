@@ -79,7 +79,7 @@ class LineChart {
       colors: iChartOption.color
     });
     // 设置VisualMap，通过数值映射颜色
-    this.baseOption.visualMap = setVisualMap(legendData, seriesData, iChartOption, this.baseOption);
+    this.baseOption.visualMap = setVisualMap(legendData, seriesData, iChartOption, this.baseOption, this);
     // 针对预测值图表需求，图表需要进行特殊处理
     handlePredict(this.baseOption, iChartOption);
     // 是否关闭hover态的效果，默认为false
@@ -167,7 +167,7 @@ class LineChart {
    * _extent是一个数组，_extent[0]为该轴上最小值，_extent[1]为该轴上最大值
    */
   getYAxisMaxValue(echartsIns, index) {
-    return echartsIns?.getModel()?.getComponent('yAxis', index)?.axis?.scale?._extent?.[1] || 1;
+    return echartsIns?.getModel?.()?.getComponent('yAxis', index)?.axis?.scale?._extent?.[1] || 1;
   }
 
   /**
@@ -177,14 +177,16 @@ class LineChart {
    * _extent是一个数组，_extent[0]为该轴上最小值，_extent[1]为该轴上最大值
    */
   getYAxisMinValue(echartsIns, index) {
-    return echartsIns?.getModel()?.getComponent('yAxis', index)?.axis?.scale?._extent?.[0] || 0;
+    return echartsIns?.getModel?.()?.getComponent('yAxis', index)?.axis?.scale?._extent?.[0] || 0;
   }
 
   resize(callback) {
     // 坐标轴二次计算
-    AdaptiveRectSys(this.baseOption, this.iChartOption, this.chartInstance, this)
-    this.baseOption.legend = legend(this.iChartOption, 'LineChart', this.chartInstance);
-    callback(this.baseOption);
+    if (this.iChartOption.adaptive || this.iChartOption.legend?.svg) {
+      AdaptiveRectSys(this.baseOption, this.iChartOption, this.chartInstance, this)
+      this.baseOption.legend = legend(this.iChartOption, 'LineChart', this.chartInstance);
+      callback(this.baseOption, { notMerge: false });
+    }
   }
 }
 
